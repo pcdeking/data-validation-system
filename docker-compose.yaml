@@ -1,0 +1,47 @@
+services:
+
+  postgres-db:
+    image: postgres:17
+
+    container_name: postgres-db
+
+    restart: always
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d data_validation_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: data_validation_db
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+
+    container_name: validation-api
+
+    restart: always
+
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+ 
+    ports:
+      - "3000:3000"
+
+    env_file:
+      - ./backend/.env
+
+volumes:
+  postgres_data:
