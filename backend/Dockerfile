@@ -1,3 +1,5 @@
+# This is a single stage dockerfile to start a Nodejs application
+
 FROM node:22-alpine
 
 WORKDIR /app
